@@ -4,10 +4,11 @@ const chats = mongoCollections.chats;
 const uuid = require("uuid");
 
 let exportedMethods = {
-    async getFirstNChatrooms(skipNum, takeNum) {
+    async getChatrooms() {
         const chatsCollection = await chats();
-        return await chatsCollection.find().skip(skipNum).limit(takeNum).toArray();
+        return await chatsCollection.find().toArray();
     },
+
     async getChatroomById(id) {
         if (!id) throw "Invalid ID";
         return chats().then(chatCollection => {
@@ -17,11 +18,21 @@ let exportedMethods = {
             });
         });
     },
-    async addChatroom(username, chatroomName) {
+
+    async getChatroomByName(id) {
+        if (!id) throw "Invalid ID";
+        return chats().then(chatCollection => {
+            return chatCollection.findOne({ chatroomName: id }).then(chat => {
+                if (!chat) throw "Chatroom not found";
+                return chat;
+            });
+        });
+    },
+
+    async addChatroom(chatroomName) {
         return chats().then(chatCollection => {
             let newChat = {
                 _id: uuid.v4(),
-                username: username,
                 chatroomName: chatroomName,
                 messages: []
             };
@@ -38,32 +49,41 @@ let exportedMethods = {
     },
     
     
-    async addMessages(id, chatroomId, username, message) {
+    async addMessage(message, chatroomName) {
         const chatCollection = await chats();
         
         let newMessage = {
             id: uuid.v4(),
-            chatroomId: chatroomId,
-            username: username,
             message: message
         };
 
-        const updatedInfo = await chatCollection.updateOne({ _id: id }, { $push: {messages: newMessage}});
-
+        const updatedInfo = await chatCollection.updateOne({ chatroomName: chatroomName }, { $push: {messages: newMessage}});
         if (updatedInfo.modifiedCount === 0) {
             throw "could not update chat successfully";
         }
 
-        return await this.getChatroomById(id);
+        return await this.getChatroomByName(chatroomName);
     },
-    async removeMessage(chatroomId, messageId) {
+
+    async getMessages(chatroomName) {
         const chatCollection = await chats();
-        const deletionInfo = await chatCollection.updateOne({_id: userId}, {$pull: {messages: {id:messageId}}});
-        if (deletionInfo.modifiedCount === 0) {
-            throw `Could not delete message with id of ${messageId}`;
-        }
-        return await this.getChatroomById(chatroomId);
-    }
-};
+        
+        let chatRoom = await this.getChatroomByName(chatroomName)
+
+        return chatRoom.messages
+        
+    
+    } 
+
+}
+//     async removeMessage(chatroomId, messageId) {
+//         const chatCollection = await chats();
+//         const deletionInfo = await chatCollection.updateOne({_id: userId}, {$pull: {messages: {id:messageId}}});
+//         if (deletionInfo.modifiedCount === 0) {
+//             throw `Could not delete message with id of ${messageId}`;
+//         }
+//         return await this.getChatroomById(chatroomId);
+//     }
+// };
 
 module.exports = exportedMethods;
