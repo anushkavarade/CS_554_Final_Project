@@ -6,7 +6,7 @@ import * as ROUTES from "../../const/routes"
 
 const PasswordForgetPage = () => (
   <div>
-    <h1>PasswordForget</h1>
+    <h1>Password Forget</h1>
     <PasswordForgetForm />
   </div>
 );
@@ -25,7 +25,7 @@ class PasswordForgetFormBase extends Component {
 
   onSubmit = event => {
     const { email } = this.state;
-
+    alert("You will be sent a email with the steps to change your password!")
     this.props.firebase
       .doPasswordReset(email)
       .then(() => {
@@ -56,7 +56,7 @@ class PasswordForgetFormBase extends Component {
           type="text"
           placeholder="Email Address"
         />
-        <button disabled={isInvalid} type="submit">
+        <button disabled={isInvalid} type="submit" >
           Reset My Password
         </button>
 
@@ -67,8 +67,8 @@ class PasswordForgetFormBase extends Component {
 }
 
 const PasswordForgetLink = () => (
-  <p>
-    <Link to={ROUTES.PASSWORD_FORGET}>Forgot Password?</Link>
+  <p style={{"margin": "1rem", "marginTop": "2rem"}}>
+    <Link to={ROUTES.PASSWORD_FORGET} style={{"color": "red", "textDecoration": "none", "cursor": "pointer"}}>Forgot Password?</Link>
   </p>
 );
 
