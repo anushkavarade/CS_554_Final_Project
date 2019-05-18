@@ -14,11 +14,14 @@ function createWindow() {
         height: 700,
         minWidth: 800,
         minHeight: 700,
-        icon: `${__dirname}/assets/icons/png/64x64.png`,
         movable: true,
         titleBarStyle: "hidden",
-        resizable: true
+        resizable: true,
+        webPreferences: {
+            webSecurity: false
+        }
     });
+    console.log(isDev);
     mainWindow.loadURL(isDev ? 'http://localhost:3000' : `file://${path.join(__dirname, '../build/index.html')}`);
     mainWindow.on('closed', () => mainWindow = null);
     mainWindow.once('ready-to-show', () => {
